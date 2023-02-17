@@ -1,0 +1,27 @@
+{
+    "name": "chess-live-share",
+    "version": "0.0.1",
+    "description": "In meeting chess game.",
+    "license": "Microsoft",
+    "author": "Microsoft",
+    "scripts": {
+        "build": "vite build",
+        "clean": "npx shx rm -rf dist",
+        "start:client": "vite",
+        "start:https": "vite src --config vite.https-config.js",
+        "start:server": "npx @fluidframework/azure-local-service@latest",
+        "start": "start-server-and-test start:server 7070 start:client",
+        "doctor": "eslint src/**/*.{j,t}s{,x} --fix --no-error-on-unmatched-pattern"
+    },
+    "dependencies": {
+        "@microsoft/live-share": "1.0.0-preview.4",
+        "@microsoft/teams-js": "^2.5.0",
+        "chess.js": "^1.0.0-beta.3",
+        "chessboardjs": "^0.0.1",
+        "fluid-framework": "~1.2.3",
+        "vite": "^4.1.1"
+    },
+    "devDependencies": {
+        "start-server-and-test": "^1.15.2"
+    }
+}
