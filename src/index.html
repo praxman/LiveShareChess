@@ -10,10 +10,38 @@
   <script src="js/jquery-3.4.1.min.js"></script>
   <script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.2/chess.js" integrity="sha384-s3XgLpvmHyscVpijnseAmye819Ee3yaGa8NxstkJVyA6nuDFjt59u1QvuEl/mecz" crossorigin="anonymous"></script>
+  <style>
+    *{
+      box-sizing: border-box;
+    }
+    .main-container{
+      overflow: hidden;
+      padding: 0;
+      margin: 0;
+      font-family: sans-serif;
+    }
+    #status{
+      text-align: center;
+      font-size: 1rem;
+      color: black;
+      margin: 0;
+      padding: 5px 0;
+    }
+    .board-container{
+      margin: auto;
+      width: 50vw;
+    }
+    @media only screen and (max-width: 720px) {
+      .board-container{
+        margin: 30% auto auto auto;
+        width: 95vw !important;
+      }
+    }
+  </style>
 </head>
 <body style="overflow: hidden;">
 <!--- Begin Example HTML ------------------------------------------------------>
-<div id="content"></div>
+<div id="content" class="main-container"></div>
 <!--- End Example HTML -------------------------------------------------------->
 <script type="module" src="app.js"></script>
 </body>

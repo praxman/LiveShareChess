@@ -93,11 +93,12 @@ async function start() {
 const stageTemplate = document.createElement("template");
 
 stageTemplate["innerHTML"] = `
-<div style="background-color:#FFFFFF; margin:auto; width:60vh;">
-<div id="status"></div>
-<div id="myBoard"></div>
-<button id="setStartBtn" style="text-align: center; font-size: 16px; margin: 4px 2px; background-color: #f44336; border: none; color: white;">Reset board</button>
-</div>
+<div class='board-container'>
+<div style="background-color:#FFFFFF; margin:auto; width:100%;">
+<div><p id="status"></p></div>
+<div id="myBoard" style=""></div>
+<div style="text-align: right">
+<button id="setStartBtn" style="text-align: center; font-size: 16px; margin: 4px 2px; background-color: #f44336; border: none; color: white;">Reset board</button></div>
 `;
 
 function renderStage(boardMap, elem) {
@@ -164,20 +165,21 @@ const sideBarTemplate = document.createElement("template");
 
 sideBarTemplate["innerHTML"] = `
   <style>
-    .wrapper { text-align: center; color: white }
-    .title { font-size: large; font-weight: bolder; }
-    .text { font-size: medium; }
+    .wrapper { text-align: center; color: green; margin-top: 2rem }
+    .title { font-size: 2rem; font-weight: bolder; margin: 0}
+    .text { font-size: 1.2rem; color: orange; margin: 10px 0;}
+    .button { font-size: 1.2rem; color: black; margin: 0 15px; width: 90%;margin-top: 2rem; height: 40px; border: 1px solid black; border-radius: 10px; font-weight: 500}
   </style>
   <div class="wrapper">
     <p class="title">Lets Play</p>
     <p class="text">Play with your friend by clicking on the Share & Start game button </p>
+    <button class="button" id="shareBtn">Share & Start Game </button>
   </div>
 `;
 
 function renderSideBar(elem) {
     elem.appendChild(sideBarTemplate.content.cloneNode(true));
-    const shareToStageButton = document.createElement("button");
-    shareToStageButton["innerHTML"] = "Share & Start Game";
+    const shareToStageButton = document.getElementById("shareBtn");
     shareToStageButton.onclick = shareToStage;
     elem.appendChild(shareToStageButton);
 }
