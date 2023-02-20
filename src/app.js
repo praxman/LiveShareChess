@@ -16,11 +16,12 @@ var game = new Chess()
 var $status = null
 var boardMap = null
 
+//LiveShare: Start
 // LiveShare: Define container schema
 // const moveSchema = { source: "", target: ""}
 // const chessLiveShareSchema = {
 //   move: moveSchema,
-//   gameFen: "",
+//   gameFen: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR",
 //   resetRequested: false
 // }
 // const boardStatusKey = "board-status-key"
@@ -30,10 +31,27 @@ var boardMap = null
 // };
 
 // function onContainerFirstCreated(container) {
-//   // boardMap = container.initialObjects.boardMap
-//   // boardMap.set(boardStatusKey, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
+//   boardMap = container.initialObjects.boardMap
+//   boardMap.set(boardStatusKey, chessLiveShareSchema);
 // }
 //LiveShare: end
+
+//LiveShare: Start
+// async function joinContainer() {
+//     // Are we running in teams?
+//     const host = searchParams.get("inTeams")
+//         ? LiveShareHost.create()
+//         : TestLiveShareHost.create();
+
+//     // Create client
+//     const client = new LiveShareClient(host);
+
+//     // Join container
+//     return await client.joinContainer(containerSchema, onContainerFirstCreated);
+// }
+//LiveShare: end
+
+
 
 // STARTUP LOGIC
 async function start() {
@@ -74,20 +92,6 @@ async function start() {
             break;
     }
 }
-//LiveShare: Start
-// async function joinContainer() {
-//     // Are we running in teams?
-//     const host = searchParams.get("inTeams")
-//         ? LiveShareHost.create()
-//         : TestLiveShareHost.create();
-
-//     // Create client
-//     const client = new LiveShareClient(host);
-
-//     // Join container
-//     return await client.joinContainer(containerSchema, onContainerFirstCreated);
-// }
-//LiveShare: end
 
 // STAGE VIEW
 const stageTemplate = document.createElement("template");
@@ -98,7 +102,7 @@ stageTemplate["innerHTML"] = `
 <div><p id="status"></p></div>
 <div id="myBoard" style=""></div>
 <div style="text-align: right">
-<button id="setStartBtn" style="text-align: center; font-size: 16px; margin: 4px 2px; background-color: #f44336; border: none; color: white;">Reset board</button></div>
+<button id="resetBtn" style="text-align: center; font-size: 16px; margin: 4px 2px; background-color: #f44336; border: none; color: white;">Reset board</button></div>
 `;
 
 function renderStage(boardMap, elem) {
@@ -109,17 +113,18 @@ function renderStage(boardMap, elem) {
     moveSpeed: 'slow',
     snapbackSpeed: 300,
     snapSpeed: 100,
-    position: 'start'
+    position: 'start',
+    showNotation: false
   }
   elem.appendChild(stageTemplate.content.cloneNode(true));  
   board = Chessboard('myBoard', boardConfig)
   $status = $('#status');
   
-  $('#setStartBtn').on('click', function onClick(){
+  $('#resetBtn').on('click', function onClick(){
         //LiveShare: Start
         // let chessLiveShareSchema = {
         //   move: {source: "", target: ""},
-        //   gameFen: "",
+        //   gameFen: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR",
         //   resetRequested: true
         // }
         // boardMap.set(boardStatusKey, chessLiveShareSchema)
@@ -131,8 +136,9 @@ function renderStage(boardMap, elem) {
         updateStatus();
   });
 
+    //LiveShare: Start
     // Live share: Get the current value of the shared data to update the view whenever it changes.
-    // const updateBoard = () => {
+    // const boardMapUpdated = () => {
     //   const chessLiveShareSchema = boardMap.get(boardStatusKey);
     //   if( chessLiveShareSchema.resetRequested ) {
     //     game.reset()
@@ -152,114 +158,15 @@ function renderStage(boardMap, elem) {
     //   updateStatus();
     // };
     // // Use the changed event to trigger the rerender whenever the value changes.
-    // boardMap.on("valueChanged", updateBoard);
+    // boardMap.on("valueChanged", boardMapUpdated);
     //LiveShare: End
     //update current board status
     updateStatus();
     $(window).resize(board.resize)
 }
 
-// SIDEBAR VIEW
 
-const sideBarTemplate = document.createElement("template");
-
-sideBarTemplate["innerHTML"] = `
-  <style>
-    .wrapper { text-align: center; color: green; margin-top: 2rem }
-    .title { font-size: 2rem; font-weight: bolder; margin: 0}
-    .text { font-size: 1.2rem; color: orange; margin: 10px 0;}
-    .button { font-size: 1.2rem; color: black; margin: 0 15px; width: 90%;margin-top: 2rem; height: 40px; border: 1px solid black; border-radius: 10px; font-weight: 500}
-  </style>
-  <div class="wrapper">
-    <p class="title">Lets Play</p>
-    <p class="text">Play with your friend by clicking on the Share & Start game button </p>
-    <button class="button" id="shareBtn">Share & Start Game </button>
-  </div>
-`;
-
-function renderSideBar(elem) {
-    elem.appendChild(sideBarTemplate.content.cloneNode(true));
-    const shareToStageButton = document.getElementById("shareBtn");
-    shareToStageButton.onclick = shareToStage;
-    elem.appendChild(shareToStageButton);
-}
-
-function shareToStage() {
-    meeting.shareAppContentToStage((error, result) => {
-        if (!error) {
-            console.log("Started sharing, sharedToStage result");
-        } else {
-            console.warn("SharingToStageError", error);
-        }
-    }, window.location.origin + "?inTeams=1&view=stage");
-}
-
-// SETTINGS VIEW
-
-const settingsTemplate = document.createElement("template");
-
-settingsTemplate["innerHTML"] = `
-  <style>
-    .wrapper { text-align: center; color: white }
-    .title { font-size: large; font-weight: bolder; }
-    .text { font-size: medium; }
-  </style>
-  <div class="wrapper">
-    <p class="title">Welcome to Chess Meet</p>
-    <p class="text">Press the save button to continue.</p>
-  </div>
-`;
-
-function renderSettings(elem) {
-    elem.appendChild(settingsTemplate.content.cloneNode(true));
-
-    // Save the configurable tab
-    pages.config.registerOnSaveHandler((saveEvent) => {
-        pages.config.setConfig({
-            websiteUrl: window.location.origin,
-            contentUrl: window.location.origin + "?inTeams=1&view=content",
-            entityId: "chess-meet",
-            suggestedDisplayName: "Chess Meet",
-        });
-        saveEvent.notifySuccess();
-    });
-
-    // Enable the Save button in config dialog
-    pages.config.setValidityState(true);
-}
-
-// Error view
-
-const errorTemplate = document.createElement("template");
-
-errorTemplate["inner" + "HTML"] = `
-  <style>
-    .wrapper { text-align: center; color: red }
-    .error-title { font-size: large; font-weight: bolder; }
-    .error-text { font-size: medium; }
-  </style>
-  <div class="wrapper">
-    <p class="error-title">Something went wrong</p>
-    <p class="error-text"></p>
-    <button class="refresh"> Try again </button>
-  </div>
-`;
-
-function renderError(elem, error) {
-    elem.appendChild(errorTemplate.content.cloneNode(true));
-    const refreshButton = elem.querySelector(".refresh");
-    const errorText = elem.querySelector(".error-text");
-
-    // Refresh the page on click
-    refreshButton.onclick = () => {
-        window.location.reload();
-    };
-    console.error(error);
-    const errorTextContent = error.toString();
-    errorText.textContent = errorTextContent;
-}
-
-// Game logics
+// Chess board Callbacks
 function onDragStart (source, piece, position, orientation) {
   // do not pick up pieces if the game is over
   if (game.game_over()) return false
@@ -295,6 +202,7 @@ function onDrop (source, target) {
   updateStatus()
 }
 
+// Top View : Update Game status
 function updateStatus () {
   var status = ''
 
@@ -324,7 +232,105 @@ function updateStatus () {
   }
   
   $status.html('Status: '+status)
-  console.log(game.fen());
+  console.log('gameFen : ' + game.fen());
+}
+
+
+// SIDEBAR VIEW
+const sideBarTemplate = document.createElement("template");
+
+sideBarTemplate["innerHTML"] = `
+  <style>
+    .wrapper { text-align: center; color: green; margin-top: 2rem }
+    .title { font-size: 2rem; font-weight: bolder; margin: 0}
+    .text { font-size: 1.2rem; color: orange; margin: 10px 0;}
+    .button { font-size: 1.2rem; color: black; margin: 0 15px; width: 90%;margin-top: 2rem; height: 40px; border: 1px solid black; border-radius: 10px; font-weight: 500}
+  </style>
+  <div class="wrapper">
+    <p class="title">Lets Play</p>
+    <p class="text">Play with your friend by clicking on the Share & Start game button </p>
+    <button class="button" id="shareBtn">Share & Start Game </button>
+  </div>
+`;
+
+function renderSideBar(elem) {
+    elem.appendChild(sideBarTemplate.content.cloneNode(true));
+    const shareToStageButton = document.getElementById("shareBtn");
+    shareToStageButton.onclick = shareToStage;
+    elem.appendChild(shareToStageButton);
+}
+
+function shareToStage() {
+    meeting.shareAppContentToStage((error, result) => {
+        if (!error) {
+            console.log("Started sharing, sharedToStage result");
+        } else {
+            console.warn("SharingToStageError", error);
+        }
+    }, window.location.origin + "?inTeams=1&view=stage");
+}
+
+// SETTINGS VIEW
+const settingsTemplate = document.createElement("template");
+
+settingsTemplate["innerHTML"] = `
+  <style>
+    .wrapper { text-align: center; color: white }
+    .title { font-size: large; font-weight: bolder; }
+    .text { font-size: medium; }
+  </style>
+  <div class="wrapper">
+    <p class="title">Welcome to Chess Meet</p>
+    <p class="text">Press the save button to continue.</p>
+  </div>
+`;
+
+function renderSettings(elem) {
+    elem.appendChild(settingsTemplate.content.cloneNode(true));
+
+    // Save the configurable tab
+    pages.config.registerOnSaveHandler((saveEvent) => {
+        pages.config.setConfig({
+            websiteUrl: window.location.origin,
+            contentUrl: window.location.origin + "?inTeams=1&view=content",
+            entityId: "chess-meet",
+            suggestedDisplayName: "Chess Meet",
+        });
+        saveEvent.notifySuccess();
+    });
+
+    // Enable the Save button in config dialog
+    pages.config.setValidityState(true);
+}
+
+// Error view
+const errorTemplate = document.createElement("template");
+
+errorTemplate["inner" + "HTML"] = `
+  <style>
+    .wrapper { text-align: center; color: red }
+    .error-title { font-size: large; font-weight: bolder; }
+    .error-text { font-size: medium; }
+  </style>
+  <div class="wrapper">
+    <p class="error-title">Something went wrong</p>
+    <p class="error-text"></p>
+    <button class="refresh"> Try again </button>
+  </div>
+`;
+
+function renderError(elem, error) {
+    elem.appendChild(errorTemplate.content.cloneNode(true));
+    const refreshButton = elem.querySelector(".refresh");
+    const errorText = elem.querySelector(".error-text");
+
+    // Refresh the page on click
+    refreshButton.onclick = () => {
+        window.location.reload();
+    };
+    console.error(error);
+    const errorTextContent = error.toString();
+    errorText.textContent = errorTextContent;
 }
 
 start().catch((error) => console.error(error));
