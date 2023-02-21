@@ -3,8 +3,8 @@
  * Licensed under the MIT License.
  */
 //LiveShare: Start
-// import { SharedMap } from "fluid-framework";
-// import { LiveShareClient, TestLiveShareHost } from "@microsoft/live-share";
+import { SharedMap } from "fluid-framework";
+import { LiveShareClient, TestLiveShareHost } from "@microsoft/live-share";
 //LiveShare: end
 import { app, pages, meeting, LiveShareHost } from "@microsoft/teams-js";
 
@@ -18,37 +18,37 @@ var boardMap = null
 
 //LiveShare: Start
 // LiveShare: Define container schema
-// const moveSchema = { source: "", target: ""}
-// const chessLiveShareSchema = {
-//   move: moveSchema,
-//   gameFen: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR",
-//   resetRequested: false
-// }
-// const boardStatusKey = "board-status-key"
+const moveSchema = { source: "", target: ""}
+const chessLiveShareSchema = {
+  move: moveSchema,
+  gameFen: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR",
+  resetRequested: false
+}
+const boardStatusKey = "board-status-key"
 
-// const containerSchema = {
-//     initialObjects: { boardMap: SharedMap },
-// };
+const containerSchema = {
+    initialObjects: { boardMap: SharedMap },
+};
 
-// function onContainerFirstCreated(container) {
-//   boardMap = container.initialObjects.boardMap
-//   boardMap.set(boardStatusKey, chessLiveShareSchema);
-// }
+function onContainerFirstCreated(container) {
+  boardMap = container.initialObjects.boardMap
+  boardMap.set(boardStatusKey, chessLiveShareSchema);
+}
 //LiveShare: end
 
 //LiveShare: Start
-// async function joinContainer() {
-//     // Are we running in teams?
-//     const host = searchParams.get("inTeams")
-//         ? LiveShareHost.create()
-//         : TestLiveShareHost.create();
+async function joinContainer() {
+    // Are we running in teams?
+    const host = searchParams.get("inTeams")
+        ? LiveShareHost.create()
+        : TestLiveShareHost.create();
 
-//     // Create client
-//     const client = new LiveShareClient(host);
+    // Create client
+    const client = new LiveShareClient(host);
 
-//     // Join container
-//     return await client.joinContainer(containerSchema, onContainerFirstCreated);
-// }
+    // Join container
+    return await client.joinContainer(containerSchema, onContainerFirstCreated);
+}
 //LiveShare: end
 
 
@@ -82,8 +82,8 @@ async function start() {
         default:
             try {
                 //LiveShare: start
-                // const { container } = await joinContainer();
-                // boardMap = container.initialObjects.boardMap;
+                const { container } = await joinContainer();
+                boardMap = container.initialObjects.boardMap;
                 //LiveShare: End
                 renderStage(boardMap, root);
             } catch (error) {
@@ -122,12 +122,12 @@ function renderStage(boardMap, elem) {
   
   $('#resetBtn').on('click', function onClick(){
         //LiveShare: Start
-        // let chessLiveShareSchema = {
-        //   move: {source: "", target: ""},
-        //   gameFen: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR",
-        //   resetRequested: true
-        // }
-        // boardMap.set(boardStatusKey, chessLiveShareSchema)
+        let chessLiveShareSchema = {
+          move: {source: "", target: ""},
+          gameFen: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR",
+          resetRequested: true
+        }
+        boardMap.set(boardStatusKey, chessLiveShareSchema)
         //LiveShare: end
         
         //Comment below lines when liveshare is enabled to reduce rendering
@@ -138,27 +138,27 @@ function renderStage(boardMap, elem) {
 
     //LiveShare: Start
     // Live share: Get the current value of the shared data to update the view whenever it changes.
-    // const boardMapUpdated = () => {
-    //   const chessLiveShareSchema = boardMap.get(boardStatusKey);
-    //   if( chessLiveShareSchema.resetRequested ) {
-    //     game.reset()
-    //     board.start(false);
-    //   } else {
-    //     //Update board
-    //     board.position(chessLiveShareSchema.gameFen, false);
-    //     //update game
-    //     const moveStart = chessLiveShareSchema.move.source;
-    //     const moveTarget = chessLiveShareSchema.move.target;
-    //     game.move({
-    //       from: moveStart,
-    //       to: moveTarget,
-    //       promotion: 'q' // NOTE: always promote to a queen for example simplicity
-    //   })
-    // }
-    //   updateStatus();
-    // };
-    // // Use the changed event to trigger the rerender whenever the value changes.
-    // boardMap.on("valueChanged", boardMapUpdated);
+    const boardMapUpdated = () => {
+      const chessLiveShareSchema = boardMap.get(boardStatusKey);
+      if( chessLiveShareSchema.resetRequested ) {
+        game.reset()
+        board.start(false);
+      } else {
+        //Update board
+        board.position(chessLiveShareSchema.gameFen, false);
+        //update game
+        const moveStart = chessLiveShareSchema.move.source;
+        const moveTarget = chessLiveShareSchema.move.target;
+        game.move({
+          from: moveStart,
+          to: moveTarget,
+          promotion: 'q' // NOTE: always promote to a queen for example simplicity
+      })
+    }
+      updateStatus();
+    };
+    // Use the changed event to trigger the rerender whenever the value changes.
+    boardMap.on("valueChanged", boardMapUpdated);
     //LiveShare: End
     //update current board status
     updateStatus();
@@ -189,14 +189,14 @@ function onDrop (source, target) {
   // illegal move
   if (move === null) return 'snapback'
   //LiveShare: Start
-  // if ( boardMap ) {
-  //   var chessLiveShareSchema = {
-  //     move: {source: source, target: target},
-  //     gameFen: game.fen(),
-  //     resetRequested: false
-  //   }
-  //   boardMap.set(boardStatusKey, chessLiveShareSchema);
-  // }
+  if ( boardMap ) {
+    var chessLiveShareSchema = {
+      move: {source: source, target: target},
+      gameFen: game.fen(),
+      resetRequested: false
+    }
+    boardMap.set(boardStatusKey, chessLiveShareSchema);
+  }
   //LiveShare: End
   //Comment below line when liveshare is enabled to avoid double rendering
   updateStatus()
